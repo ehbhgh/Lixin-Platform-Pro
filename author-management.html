@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+    
+    <head>
+        <meta charset="UTF-8">
+        <title>力心传媒</title>
+        <meta name="renderer" content="webkit">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+        <link rel="stylesheet" href="./css/font.css">
+        <link rel="stylesheet" href="./css/xadmin.css">
+        <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+        <script src="./lib/layui/layui.js" charset="utf-8"></script>
+        <script type="text/javascript" src="./js/xadmin.js"></script>
+    </head>
+    
+    <body>
+        <div class="x-nav">
+            <h2>
+                经纪人达人对应关系
+                <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:5px;float:right" onclick="location.reload()" title="刷新">
+                    <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i>
+                </a>
+            </h2>
+            
+        </div>
+        <div class="layui-fluid">
+            <div class="layui-row">
+                <div class="layui-col-md12">
+                    <div class="layui-card">
+                        <div class="layui-card-body">
+                            <form class="layui-form">
+                                <div class="layui-row layui-col-space10">
+                                    <h2>按经纪人查询</h2>
+                                </div>
+                                <div class="layui-row layui-col-space10">
+                                    <h3 class="layui-form-label layui-col-md3" style="width: auto">
+                                        下辖经纪人
+                                    </h3>
+                                    <div class="layui-col-md3">
+                                        <select name="charger" id="charger" lay-filter="charger" lay-submit="" lay-search>
+                                            <option value="">请选择经纪人（可模糊查询）</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <hr>
+                        <div class="layui-card-body">
+                            <div class="layui-row layui-col-space10">
+                                <h2>按达人查询</h2>
+                            </div>
+                            <form class="layui-form">
+                                <div class="layui-row layui-col-space10">
+                                    <h3 class="layui-form-label layui-col-md3" style="width: auto">
+                                        达人的ID
+                                    </h3>
+                                    <div class="layui-col-md3">
+                                        <input type="text" id="celebrityId" name="celebrityId" required="" lay-verify="required" autocomplete="off" class="layui-input" value="" placeholder="请准确输入达人ID">
+                                    </div>
+                                    <div class="layui-col-md3">
+                                        <button class="layui-btn" lay-filter="searchById" lay-submit="">
+                                            <i class="layui-icon layui-icon-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                            <form class="layui-form">
+                                <div class="layui-row layui-col-space10">
+                                    <h3 class="layui-form-label layui-col-md3" style="width: auto">
+                                        达人昵称
+                                    </h3>
+                                    <div class="layui-col-md3">
+                                        <input type="text" id="celebrityName" name="celebrityName" required="" lay-verify="required" autocomplete="off" class="layui-input" value="" placeholder="使用达人昵称模糊查询">
+                                    </div>
+                                    <div class="layui-col-md3">
+                                        <button class="layui-btn" lay-filter="searchByName" lay-submit="">
+                                            <i class="layui-icon layui-icon-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <hr>
+                        <div class="layui-card-body">
+                            <div class="layui-row layui-col-space10">
+                                <div class="layui-col-md1">
+                                    <button class="layui-btn layui-btn-normal" onclick="xadmin.open('为达人绑定经纪人','new-management.html')" href="javascript:;">
+                                        为达人绑定经纪人
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-card-body" id="sign-celebrities-total-num">
+                            <div class="layui-row">
+                                <table id="dataTable"></table>
+                                <div id="pagination"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script>
+        function dismiss(charger_id, celebrity_id){
+            layer.open({
+                content: '确认解绑？'
+                ,btnAlign: 'c'
+                ,btn: ['确认', '取消']
+                ,yes: function(index, layero){
+                    $.ajax({
+                        type: "POST",
+                        url: "http://129.211.173.61:8080/api/v1.0/delete/celebrity",
+                        xhrFields: { 
+                            withCredentials: true
+                        },
+                        headers: {
+                            "Access-Token": localStorage.getItem("accessToken"),
+                            "Content-Type":"application/json;charset=utf8"
+                        },
+                        data: JSON.stringify({
+                            charger_id: charger_id,
+                            celebrity_id: celebrity_id
+                        }),
+                        success: function(data){
+                            layer.close(index);
+                            if (data.code != 200) {
+                                layer.msg(data.msg,function(){
+                                })
+                            } else {
+                                layer.msg(data.msg, function(){
+                                })
+                            }
+                        }
+                    })
+                }
+            });
+        }
+
+        layui.use(['code', 'table', 'form', 'laypage'],
+            function() {
+                layui.code();
+
+                var form = layui.form;
+
+                var table = layui.table;
+
+                var laypage = layui.laypage;
+
+                function number_format(num) {
+                    return num && num.toString().replace(/(^|\s)\d+/g, (m) => m.replace(/(?=(?!\b)(\d{3})+$)/g, ','))
+                };
+
+                var addButton = function(data) {
+                    var charger_id = data.charger_id;
+                    var celebrity_id = data.user_id;
+                    html = `<button class="layui-btn" onclick="dismiss(${charger_id},'${celebrity_id}')" href="javascript:;">解除关系</button>`
+                    return html
+                };
+
+                var createChargerCelebrityRelationTable = function(charger_id) {
+                    $.ajax({
+                        type: "GET",
+                        url: "http://129.211.173.61:8080/api/v1.0/celebrities_list?charger_id=" + charger_id + "&page=1&per_page=10",
+                        hrFields: { 
+                            withCredentials: true 
+                        },
+                        headers: {
+                            "Access-Token": localStorage.getItem("accessToken")
+                        },
+                        success: function(data){
+                            if (data.code != 200) {
+                                layer.msg(data.msg,function(){
+                                })
+                            } else {
+                                var user_infos = data.user_infos;
+                                table.render({
+                                    elem: '#dataTable'
+                                    ,totalRow: true
+                                    ,cols: [[
+                                        {field: 'charger_name', title: '经纪人', align: 'center'}
+                                      ,{field: 'user_id', title: '达人主页ID', align: 'center'}
+                                      ,{field: 'user_name', title: '达人主页昵称', align: 'center'}
+                                      ,{field: 'fans_count', title: '达人粉丝数', align: 'center'} 
+                                      ,{field: 'actions', title: '操作', align: 'center', templet: addButton}
+                                    ]]
+                                    ,data: user_infos
+                                    ,autoSort: false
+                                    ,limit: 100
+                                });
+                                
+                                laypage.render({
+                                    elem: 'pagination',
+                                    count: data.total,
+                                    limit: 10,
+                                    curr: 1,
+                                    groups: 3,
+                                    layout: ['count', 'prev', 'next', 'page', 'skip'],
+                                    jump: function(obj, first){
+                                        if (!first) {
+                                            $.ajax({
+                                                type: "GET",
+                                                url: "http://129.211.173.61:8080/api/v1.0/celebrities_list?charger_id=" + charger_id + "&page=" + obj.curr + "&per_page=" + obj.limit,
+                                                xhrFields: { 
+                                                    withCredentials: true 
+                                                },
+                                                headers: {
+                                                    "Access-Token": localStorage.getItem("accessToken"),
+                                                    "Content-Type":"application/json;charset=utf8"
+                                                },
+                                                success: function(data){
+                                                    if (data.code == 200) {
+                                                        var user_infos = data.user_infos;
+                                                        table.reload('dataTable', {
+                                                            data: user_infos
+                                                        })
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    }
+                                })
+                            };
+                        }
+                    });
+                };
+
+                $.ajax({
+                    type: "GET",
+                    url: "http://129.211.173.61:8080/api/v1.0/display_charger/list",
+                    xhrFields: { 
+                        withCredentials: true 
+                    },
+                    headers: {
+                        "Access-Token": localStorage.getItem("accessToken"),
+                        "Content-Type":"application/json;charset=utf8"
+                    },
+                    success: function(data){
+                        if (data.code == 200) {
+                            var chargerList = data.result;
+                            $('#charger').children().remove();
+                            $('#charger').append(new Option('所有经纪人', -1));
+                            for (var i in chargerList) {
+                                $('#charger').append(new Option(chargerList[i].name, chargerList[i].id));
+                            };
+                            $('#charger1').children().remove();
+                            for (var i in chargerList) {
+                                $('#charger1').append(new Option(chargerList[i].name, chargerList[i].id));
+                            };
+                            form.render('select');
+                            var charger_id = $('#charger')[0].options[0].value;
+                            createChargerCelebrityRelationTable(charger_id);
+                        } else {
+                            layer.msg("没有权限",function(){
+                                window.parent.location.href = 'login.html';
+                            })
+                        }
+                    }
+                });
+                
+                form.on('select(charger)', function(data){
+                    var charger_id = data.value;
+                    createChargerCelebrityRelationTable(charger_id);
+                    $('#pagination').removeClass('layui-hide');
+                    $('#pagination').addClass('layui-show');
+                    return false
+                });
+
+                form.on('submit(searchById)', function(data){
+                    $('#pagination').removeClass('layui-show');
+                    $('#pagination').addClass('layui-hide');
+                    var celebrityId = data.field.celebrityId + ''
+                    $.ajax({
+                        type: "GET",
+                        url: "http://129.211.173.61:8080/api/v1.0/celebrity_id/detail/list?celebrity_id=" + celebrityId + "&page=1&per_page=10",
+                        hrFields: { 
+                            withCredentials: true 
+                        },
+                        headers: {
+                            "Access-Token": localStorage.getItem("accessToken")
+                        },
+                        success: function(data){
+                            var result = data.result;
+                            table.reload('dataTable', {
+                                data: result
+                            })
+                        }
+                    })
+                    return false
+                });
+
+                form.on('submit(searchByName)', function(data){
+                    $('#pagination').removeClass('layui-show');
+                    $('#pagination').addClass('layui-hide');
+                    var celebrityName = data.field.celebrityName + ''
+                    $.ajax({
+                        type: "GET",
+                        url: "http://129.211.173.61:8080/api/v1.0/celebrity/detail_name/list?celebriyty_name=" + celebrityName + "&page=1&per_page=10",
+                        hrFields: { 
+                            withCredentials: true 
+                        },
+                        headers: {
+                            "Access-Token": localStorage.getItem("accessToken")
+                        },
+                        success: function(data){
+                            var result = data.result;
+                            table.reload('dataTable', {
+                                data: result
+                            })
+                        }
+                    })
+                    return false
+                });
+        });
+    </script>
+
+</html>

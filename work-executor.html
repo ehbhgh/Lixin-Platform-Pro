@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+
+<head>
+    <meta charset="UTF-8">
+    <title>力心传媒</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+        content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="stylesheet" href="./css/font.css">
+    <link rel="stylesheet" href="./css/xadmin.css">
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script src="./lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/xadmin.js"></script>
+</head>
+<style>
+    .btn {
+        height: 35px !important;
+        margin-bottom: 20px;
+    }
+</style>
+
+<body>
+    <div class="layui-fluid">
+        <button type="button" class="layui-btn layui-btn-normal btn"><i
+                class="layui-icon layui-icon-return"></i>返回</button>
+        <div class="layui-card" id="contractStatus">
+            <div class="layui-card-header">
+                <h2>合约状态</h2>
+            </div>
+            <div class="layui-card-body">
+                <div class="layui-row layui-col-space10" id="status">
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="layui-card" id="contentVideo">
+            <div class="layui-card-header">
+                <h2>作品视频</h2>
+            </div>
+            <div class="layui-card-body">
+                <div class="layui-row layui-col-space10" id="video">
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="layui-card" id="contentPicture">
+            <div class="layui-card-header">
+                <h2>作品图片集</h2>
+            </div>
+            <div class="layui-card-body">
+                <div class="layui-row layui-col-space10" id="picture">
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="layui-card" id="contentWords">
+            <div class="layui-card-header">
+                <h2>作品文字部分</h2>
+            </div>
+            <div class="layui-card-body">
+                <div class="layui-row layui-col-space10" id="words">
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="layui-card" id="contentTitle">
+            <div class="layui-card-header">
+                <h2>作品标题</h2>
+            </div>
+            <div class="layui-card-body">
+                <div class="layui-row layui-col-space10" id="title">
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="layui-card" id="contentTopic">
+            <div class="layui-card-header">
+                <h2>作品话题</h2>
+            </div>
+            <div class="layui-card-body">
+                <div class="layui-row layui-col-space10" id="topic">
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="layui-card" id="contentAction">
+            <div class="layui-card-header">
+                <h2>内容一审操作</h2>
+            </div>
+            <div class="layui-card-body">
+                <div class="layui-row layui-col-space10" id="action">
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    document.querySelector(".btn").addEventListener("click", () => {
+        window.history.back()
+    })
+    var agreeContent1 = function (contractId) {
+        $.ajax({
+            type: 'POST',
+            url: 'http://129.211.173.61:8080/api/v1.0/executor/agreeContent1',
+            xhrFields: {
+                withCredentials: true
+            },
+            headers: {
+                "Access-Token": localStorage.getItem("accessToken"),
+                "Content-Type": "application/json;charset=utf-8"
+            },
+            data: JSON.stringify({ contract_id: contractId }),
+            success: function (data) {
+                console.log(data);
+                if (data.code == 200) {
+                    layer.msg(data.msg, function () {
+                        window.location.href = 'commercial-executed-participants.html?comm_id=' + data.result.comm_id
+                    })
+                } else {
+                    layer.msg(data.msg, function () {
+                    })
+                }
+            }
+
+        })
+        return false
+    };
+
+
+    var showOriginalPic = function (imgUrl) {
+        var image = new Image();
+        image.src = imgUrl;
+        var width = image.naturalWidth / 3;
+        var height = image.naturalHeight / 3;
+        if (height >= 600) {
+            var height = 600;
+            var width = height / image.naturalHeight * image.naturalWidth;
+        };
+        console.log([width, height]);
+        var img_infor = "<img width='" + width + "' height='" + height + "' border='0' src='" + imgUrl + "' />";
+        layer.open({
+            title: '预览图片',
+            type: 1,
+            content: img_infor,
+            area: ['auto', 'auto'],
+            shade: 0.5
+        });
+    };
+
+
+    layui.use(['code', 'form', 'layer'],
+        function () {
+            layui.code();
+
+            var form = layui.form;
+
+            function number_format(num) {
+                return num && num.toString().replace(/(^|\s)\d+/g, (m) => m.replace(/(?=(?!\b)(\d{3})+$)/g, ','))
+            }
+
+            var contractId = parseInt(window.location.href.split("=")[1]);
+
+            form.on('submit(disagreeContent1)', function (data) {
+                console.log(data.field);
+                $.ajax({
+                    type: 'POST',
+                    url: 'http://129.211.173.61:8080/api/v1.0/executor/disagreeContent1',
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    headers: {
+                        "Access-Token": localStorage.getItem("accessToken"),
+                        "Content-Type": "application/json;charset=utf-8"
+                    },
+                    data: JSON.stringify({ contract_id: contractId, suggestions: data.field.suggestions }),
+                    success: function (data) {
+                        console.log(data);
+                        if (data.code == 200) {
+                            layer.msg(data.msg, function () {
+                                window.location.href = 'commercial-executed-participants.html?comm_id=' + data.result.comm_id
+                            })
+                        } else {
+                            layer.msg(data.msg, function () {
+                            })
+                        }
+                    }
+                })
+                return false
+            });
+
+            $.ajax({
+                type: "GET",
+                url: "http://129.211.173.61:8080/api/v1.0/executor/preview/" + contractId,
+                xhrFields: {
+                    withCredentials: true
+                },
+                headers: {
+                    "Access-Token": localStorage.getItem("accessToken")
+                },
+                success: function (data) {
+                    console.log(data.result);
+                    if (data.code == 200) {
+                        var status = data.result.state;
+                        if (status == 4) {
+                            var html = `<h2 style="color:red; margin-left: 50px">内容一审进行中</h2>`
+                        } else if (status == 5) {
+                            var html = `<h2 style="color:red; margin-left: 50px">内容二审进行中</h2>`
+                        } else if (status == 6) {
+                            var html = `<h2 style="color:red; margin-left: 50px">内容审核通过</h2>`
+                        } else if (status == 7) {
+                            var html = `<h2 style="color:red; margin-left: 50px">内容审核驳回，达人修改中</h2>`
+                        } else if (statis == 8) {
+                            var html = `<h2 style="color:red; margin-left: 50px">合约已完成</h2>`
+                        } else {
+                            var html = `<h2 style="color:red; margin-left: 50px">非法状态</h2>`
+                        }
+                        $('#status').append(html);
+
+                        var videoKeyList = data.result.video_url.video_urls;
+                        if (videoKeyList.length == 1) {
+                            var videoUrl = "https://wxmcnbucket-1259537042.cos.ap-shanghai.myqcloud.com/" + videoKeyList[0];
+                            var html = `
+                                    <video width="500" height="500" controls="controls" autoplay="autoplay">
+                                      <source src="${videoUrl}" type="video/mp4" />
+                                    </video>
+                                `
+                            $('#video').append(html);
+                        } else {
+                            $('#contentVideo').attr('class', 'layui-hide');
+                        }
+
+                        var pictureKeyList = data.result.picture_urls.picture_urls;
+                        if (pictureKeyList.length == 0) {
+                            $('#contentPicture').attr('class', 'layui-hide');
+                        } else {
+                            for (var i in pictureKeyList) {
+                                var imgUrl = "https://wxmcnbucket-1259537042.cos.ap-shanghai.myqcloud.com/" + pictureKeyList[i];
+                                var html = `
+                                        <div class="layui-col-md4">
+                                            <div class="layui-row grid-demo">
+                                                <div class="layui-col-md12">
+                                                    <img height="500" width="375" src="${imgUrl}" onclick="showOriginalPic('${imgUrl}')"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `
+                                $('#picture').append(html);
+                            }
+                        };
+
+                        var words = decodeURIComponent(data.result.works);
+                        var paragraphs = words.split("\n");
+                        var html = ""
+                        for (var i in paragraphs) {
+                            html += `<p>${paragraphs[i]}</p>`
+                        };
+                        $('#words').append(html);
+
+                        var title = decodeURIComponent(data.result.title);
+                        var html = `<h3>${title}</h3>`
+                        $('#title').append(html);
+
+                        var topic = decodeURIComponent(data.result.topic);
+                        var html = `<h3>${topic}</h3>`
+                        $('#topic').append(html);
+
+                        if (data.result.state == 4) {
+                            var html = `
+                                    <div class="layui-col-md3">
+                                        <button class="layui-btn layui-btn-normal" onclick="agreeContent1(${contractId})">内容一审通过</button>
+                                    </div>
+                                    <form class="layui-form" method='POST'>
+                                        <label for="suggestions" class="layui-form-label">
+                                            <span class="x-red">*</span>驳回原因</label>
+                                        <div class="layui-col-md3">
+                                            <input type="text" id="suggestions" name="suggestions" required="" lay-verify="required" autocomplete="off" class="layui-input" value="">
+                                        </div>
+                                        <div class="layui-col-md3">
+                                            <button class="layui-btn layui-btn-danger" lay-filter="disagreeContent1" lay-submit="">内容一审拒绝</button>
+                                        </div>
+                                    </form>
+                                `
+                            $('#action').append(html);
+                        } else {
+                            $('#contentAction').attr('class', 'layui-hide');
+                        }
+
+                    } else {
+                        layer.msg("没有权限", function () {
+                            window.parent.location.href = 'login.html';
+                        })
+                    }
+                }
+            });
+        });
+</script>
+
+</html>

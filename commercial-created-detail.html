@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+    
+    <head>
+        <meta charset="UTF-8">
+        <title>力心传媒</title>
+        <meta name="renderer" content="webkit">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+        <link rel="stylesheet" href="./css/font.css">
+        <link rel="stylesheet" href="./css/xadmin.css">
+        <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+        <script src="./lib/layui/layui.js" charset="utf-8"></script>
+        <script type="text/javascript" src="./js/xadmin.js"></script>
+    </head>
+    
+    <body>
+        <div class="layui-fluid">
+            <div class="x-nav">
+                <h2>
+                    商单详情
+                </h2>
+            </div>
+            <div class="layui-row">
+                <form class="layui-form" style="top: 10px">
+                    <div class="layui-card">
+                        <div class="layui-form-item">
+                            <label for="shop_name" class="layui-form-label">
+                                <span class="x-red">*</span>店铺名字</label>
+                            <div class="layui-input-inline">
+                                <input type="text" id="shop_name" name="shop_name" required="" lay-verify="required" autocomplete="off" class="layui-input" value="" disabled="disabled">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label for="shop_url" class="layui-form-label">
+                                <span class="x-red">*</span>店铺链接</label>
+                            <div class="layui-input-inline">
+                                <input type="text" id="shop_url" name="shop_url" required="" lay-verify="required" autocomplete="off" class="layui-input" value="" disabled="disabled">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label for="activity_name" class="layui-form-label">
+                                <span class="x-red">*</span>商单名称</label>
+                            <div class="layui-input-inline">
+                                <input type="text" id="activity_name" name="activity_name" required="" lay-verify="required" autocomplete="off" class="layui-input" value="" disabled="disabled">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label for="city" class="layui-form-label">
+                                <span class="x-red">*</span>可履约城市</label>
+                            <div class="layui-input-inline">
+                                <input type="text" id="city" name="city" required="" lay-verify="required" autocomplete="off" class="layui-input" value="" disabled="disabled">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label for="location" class="layui-form-label">
+                                <span class="x-red">*</span>大致位置</label>
+                            <div class="layui-input-inline">
+                                <input type="text" id="location" name="location" required="" lay-verify="required" autocomplete="off" class="layui-input" value="" disabled="disabled">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label for="introduction" class="layui-form-label">
+                                <span class="x-red">*</span>商单介绍</label>
+                            <div class="layui-input-inline">
+                                <input type="text" id="introduction" name="introduction" required="" lay-verify="required" autocomplete="off" class="layui-input" value="" disabled="disabled">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label for="commission" class="layui-form-label">
+                                <span class="x-red">*</span>佣金</label>
+                            <div class="layui-input-inline">
+                                <input type="text" id="commission" name="commission" required="" lay-verify="required" autocomplete="off" class="layui-input" value="" disabled="disabled">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label for="author_num" class="layui-form-label">
+                                <span class="x-red">*</span>需要达人数量</label>
+                            <div class="layui-input-inline">
+                                <input type="number" id="author_num" name="author_num" required="" lay-verify="required" autocomplete="off" class="layui-input" value="" disabled="disabled">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label for="fans_min" class="layui-form-label">
+                                <span class="x-red">*</span>最低粉丝数</label>
+                            <div class="layui-input-inline">
+                                <input type="number" id="fans_min" name="fans_min" required="" lay-verify="required" autocomplete="off" class="layui-input" value="" disabled="disabled">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label for="fans_max" class="layui-form-label">
+                                <span class="x-red">*</span>最高粉丝数</label>
+                            <div class="layui-input-inline">
+                                <input type="number" id="fans_max" name="fans_max" required="" lay-verify="required" autocomplete="off" class="layui-input" value="" disabled="disabled">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label for="other_author_requirements" class="layui-form-label">
+                                <span class="x-red">*</span>达人要求</label>
+                            <div class="layui-input-inline">
+                                <input type="text" id="other_author_requirements" name="other_author_requirements" required="" lay-verify="required" autocomplete="off" class="layui-input" value="" disabled="disabled">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label for="available_time" class="layui-form-label">
+                                <span class="x-red">*</span>可探店时间</label>
+                            <div class="layui-input-inline">
+                                <input type="text" id="available_time" name="available_time" required="" lay-verify="required" autocomplete="off" class="layui-input" value="" disabled="disabled">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label for="should_pay_first" class="layui-form-label">
+                                <span class="x-red">*</span>是否先买单</label>
+                            <div class="layui-input-inline">
+                                <input type="text" id="should_pay_first" name="should_pay_first" required="" lay-verify="required" autocomplete="off" class="layui-input" value="" disabled="disabled">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label for="payment_proof" class="layui-form-label">
+                                <span class="x-red">*</span>买单凭证要求</label>
+                            <div class="layui-input-inline">
+                                <input type="text" id="payment_proof" name="payment_proof" required="" lay-verify="required" autocomplete="off" class="layui-input" value="无" disabled="disabled">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label for="companion_num" class="layui-form-label">
+                                <span class="x-red">*</span>同行人数</label>
+                            <div class="layui-input-inline">
+                                <input type="number" id="companion_num" name="companion_num" required="" lay-verify="required" autocomplete="off" class="layui-input" value="" disabled="disabled">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label for="content_requirement" class="layui-form-label">
+                                <span class="x-red">*</span>内容产出要求</label>
+                            <div class="layui-input-inline">
+                                <input type="text" id="content_requirement" name="content_requirement" required="" lay-verify="required" autocomplete="off" class="layui-input" value="" disabled="disabled">
+                                <input type="hidden" id="content_other_requirement" name="content_other_requirement" required="" lay-verify="required" autocomplete="off" class="layui-input" value="无" disabled="disabled">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label for="video_num" class="layui-form-label">
+                                <span class="x-red">*</span>是否要视频</label>
+                            <div class="layui-input-inline">
+                                <input type="text" id="video_num" name="video_num" required="" lay-verify="required" autocomplete="off" class="layui-input" value="" disabled="disabled">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label for="picture_num" class="layui-form-label">
+                                <span class="x-red">*</span>图片数量</label>
+                            <div class="layui-input-inline">
+                                <input type="number" id="picture_num" name="picture_num" required="" lay-verify="required" autocomplete="off" class="layui-input" value="" disabled="disabled">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label for="content_requirement_num" class="layui-form-label">
+                                <span class="x-red">*</span>最低字数</label>
+                            <div class="layui-input-inline">
+                                <input type="number" id="content_requirement_num" name="content_requirement_num" required="" lay-verify="required" autocomplete="off" class="layui-input" value="" disabled="disabled">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label for="note_release_at" class="layui-form-label">
+                                <span class="x-red">*</span>作品期望发布时间</label>
+                            <div class="layui-input-inline">
+                                <input type="text" id="note_release_at" name="note_release_at" required="" lay-verify="required" autocomplete="off" class="layui-input" value="" disabled="disabled">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label for="note_deadline_at" class="layui-form-label">
+                                <span class="x-red">*</span>作品截止发布时间</label>
+                            <div class="layui-input-inline">
+                                <input type="text" id="note_deadline_at" name="note_deadline_at" required="" lay-verify="required" autocomplete="off" class="layui-input" value="" disabled="disabled">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label for="remarks" class="layui-form-label">备注</label>
+                            <div class="layui-input-inline">
+                                <input type="text" id="remarks" name="remarks" autocomplete="off" class="layui-input" value="" disabled="disabled">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label for="executor_name" class="layui-form-label">
+                                <span class="x-red">*</span>执行负责人</label>
+                            <div class="layui-input-inline">
+                                <div class="layui-input-inline">
+                                <input type="text" id="executor_name" name="executor_name" autocomplete="off" class="layui-input" value="" disabled="disabled">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">
+                                <span class="x-red">*</span>报名状态</label>
+                            <div class="layui-input-inline">
+                                <div class="layui-input-inline">
+                                <input type="text" id="can_enroll" name="can_enroll" autocomplete="off" class="layui-input" value="" disabled="disabled">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script>
+        layui.use(['code', 'form', 'layer'],
+            function() {
+                layui.code();
+
+                var form = layui.form;
+
+                layer = layui.layer;
+
+                var commId = window.location.href.split("=")[1];
+
+                $.ajax({
+                    type: "GET",
+                    url: "http://129.211.173.61:8080/api/v1.0/creator/commercial_detail/" + commId,
+                    xhrFields: { 
+                        withCredentials: true 
+                    },
+                    headers: {
+                        "Access-Token": localStorage.getItem("accessToken")
+                    },
+                    success: function(data){
+                        var result = data.result;
+                        $("#activity_name").attr("value", result.activity_name)
+                        $('#author_num').attr('value', result.author_num)
+                        $('#available_time').attr('value', result.available_time)
+                        if (result.can_enroll == 0) {
+                            $('#can_enroll').attr('value', '停止报名');
+                        } else if (result.can_enroll == 1) {
+                            $('#can_enroll').attr('value', '正在报名');
+                        } else {
+                            $('#can_enroll').attr('value', '未知状态');
+                        }
+                        $('#city').attr('value', result.city)
+                        $('#commission').attr('value', result.commission)
+                        $('#companion_num').attr('value', result.companion_num)
+                        $('#content_other_requirement').attr('value', result.content_other_requirement)
+                        $('#content_requirement').attr('value', result.content_requirement)
+                        $('#content_requirement_num').attr('value', result.content_requirement_num)
+                        $('#create_time').attr('value', result.create_time)
+                        $('#executor_name').attr('value', result.executor_name)
+                        $('#fans_max').attr('value', result.fans_max)
+                        $('#fans_min').attr('value', result.fans_min)
+                        $('#introduction').attr('value', result.introduction)
+                        $('#location').attr('value', result.location)
+                        $('#note_deadline_at').attr('value', result.note_deadline_at)
+                        $('#note_release_at').attr('value', result.note_release_at)
+                        $('#other_author_requirements').attr('value', result.other_author_requirements)
+                        $('#payment_proof').attr('value', result.payment_proof)
+                        $('#picture_num').attr('value', result.picture_num)
+                        $('#remarks').attr('value', result.remarks)
+                        $('#shop_name').attr('value', result.shop_name)
+                        $('#shop_url').attr('value', result.shop_url)
+                        if (result.should_pay_first == 0) {
+                            $('#should_pay_first').attr('value', "否")    
+                        } else if(result.should_pay_first == 1) {
+                            $('#should_pay_first').attr('value', "是")
+                        } else {
+                            $('#should_pay_first').attr('value', "未知")
+                        }
+                        $('#video_num').attr('value', result.video_num)
+                    }
+                })
+            });
+        </script>
+    </body>
+
+</html>

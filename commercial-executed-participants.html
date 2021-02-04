@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+
+<head>
+    <meta charset="UTF-8">
+    <title>力心传媒</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+        content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="stylesheet" href="./css/font.css">
+    <link rel="stylesheet" href="./css/xadmin.css">
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script src="./lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/xadmin.js"></script>
+    <script type="text/javascript" src="./lib/echarts.js"></script>
+
+</head>
+<style>
+    .forms {
+        padding-bottom: 20px;
+        padding-top: 20px;
+    }
+
+    .selects {
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }
+</style>
+
+<body>
+    <div class="x-nav">
+        <h2> <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:5px;float:left"
+                onclick="history.go(-1)" title="返回">
+                <i class="layui-icon layui-icon-return" style="line-height:30px"></i>
+            </a>
+            &nbsp; &nbsp; 达人参与信息
+            <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:5px;float:right"
+                onclick="location.reload()" title="刷新">
+                <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i>
+            </a>
+        </h2>
+    </div>
+    <div class="layui-fluid">
+        <div class="layui-row">
+            <div class="layui-col-md12">
+                <div class="layui-card">
+                    <div class="layui-card-body">
+                        <div class="layui-row">
+                            <blockquote class="layui-elem-quote">
+                                <span class="layui-badge-dot"></span>
+                                单击达人昵称，可在新窗口打开该达人的个人主页
+                            </blockquote>
+                        </div>
+                        <div class="layui-row">
+                            <h2>导出报名信息</h2>
+                        </div>
+                        <div class="layui-row forms">
+                            <form class="layui-form">
+                                <div class="layui-col-md2">
+                                    <select name="contractStatus" lay-filter="contractStatus">
+                                        <option value="">请选择要导出的合约状态</option>
+                                        <option value="全部">全部</option>
+                                        <option value="报名一审中">报名一审中</option>
+                                        <option value="报名二审中">报名二审中</option>
+                                        <option value='报名审核通过'>报名审核通过</option>
+                                        <option value='报名审核拒绝'>报名审核拒绝</option>
+                                        <option value='内容一审中'>内容一审中</option>
+                                        <option value='内容二审中'>内容二审中</option>
+                                        <option value='内容审核通过'>内容审核通过</option>
+                                        <option value='内容审核驳回'>内容审核驳回</option>
+                                        <option value='已完成'>已完成</option>
+                                    </select>
+                                </div>
+                                <div class="layui-col-md3" style="left:20px">
+                                    <button type="button" lay-submit="" class="layui-btn layui-btn-normal"
+                                        lay-filter="export">
+                                        <i class="layui-icon layui-icon-export"></i>导出Excel
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <hr />
+
+                        <div class="layui-row layui-col-space9 selects">
+                            <form class="layui-form " action="">
+                                <div class="layui-col-md3">
+                                    <select id="newCity" name="newCity" lay-filter="newCity"  >
+                                        <!-- <option value='' disabled selected style='display:none;'>请选择城市</option> -->
+                                    </select>
+                                </div>
+                                <div class="layui-col-md3" style="width: 20px;  height: 10px"></div>
+                                <div class="layui-col-md3">
+                                    <select name="agent" lay-filter="agent" id="agent">
+                                        <!-- <option value='' disabled selected style='display:none;'>请选择经济人</option> -->
+                                    </select>
+                                </div>
+                                <div class="layui-col-md3" style="width: 20px;  height: 10px"></div>
+                                <div class="layui-col-md3">
+                                    <select name="states" lay-filter="states" id="states">
+                                        <!-- <option value='' disabled selected style='display:none;'>请选择合约状态</option> -->
+                                    </select>
+                                </div>
+                                <div class="layui-col-md3" style="width: 30px;  height: 10px"></div>
+                                <div class="lay-form-item">
+                                    <button class="layui-btn layui-btn-normal" lay-submit lay-filter="formDemo1">
+                                        <i class="layui-icon  layui-icon-search"></i>
+                                        确认筛选</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="layui-row">
+                            <table id="dataTable" lay-filter="dataTable"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    var agreeEnrollment1 = function (contract_id) {
+        console.log(contract_id)
+        $.ajax({
+            type: "POST",
+            url: "http://129.211.173.61:8080/api/v1.0/executor/agreeEnrollment",
+            xhrFields: {
+                withCredentials: true
+            },
+            headers: {
+                "Access-Token": localStorage.getItem("accessToken"),
+                "Content-Type": "application/json;charset=utf-8"
+            },
+            data: JSON.stringify({ contract_id: contract_id }),
+            success: function (data) {
+                if (data.code != 200) {
+                    layer.msg(data.msg, function () {
+
+                    })
+                } else {
+                    $(".hide"+contract_id).hide()
+                    $(".reject"+contract_id).hide()
+                    $(".show"+contract_id).show()
+                   
+                }
+            }
+        })
+        return false
+    };
+
+    var disagreeEnrollment1 = function (contract_id) {
+        $.ajax({
+            type: "POST",
+            url: "http://129.211.173.61:8080/api/v1.0/executor/disagreeEnrollment",
+            xhrFields: {
+                withCredentials: true
+            },
+            headers: {
+                "Access-Token": localStorage.getItem("accessToken"),
+                "Content-Type": "application/json;charset=utf-8"
+            },
+            data: JSON.stringify({ contract_id: contract_id }),
+            success: function (data) {
+                if (data.code != 200) {
+                    layer.msg(data.msg, function () {
+                    })
+
+                } else {
+                    $(".hide"+contract_id).hide()
+                    $(".reject"+contract_id).show()
+                    $(".show"+contract_id).hide()
+                  
+                }
+            }
+        })
+        return false
+    };
+
+    var preview = function (contract_id) {
+        localStorage.setItem("id", contract_id)
+        window.location.href = "work-executor.html?contract_id=" + contract_id
+        return false
+    };
+
+    layui.config({
+        base: './lib/' //此处路径请自行处理, 可以使用绝对路径
+    }).extend({
+        excel: 'excel'
+    });
+
+    layui.use(['code', 'table', 'form', 'excel'],
+        function () {
+            layui.code();
+
+            var form = layui.form;
+
+            var table = layui.table;
+
+            var excel = layui.excel;
+
+            function number_format(num) {
+                return num && num.toString().replace(/(^|\s)\d+/g, (m) => m.replace(/(?=(?!\b)(\d{3})+$)/g, ','))
+            };
+
+            var addButton = function (data) {
+                console.log(data)
+                if (data.state == '报名一审中') {
+                    html = `<button class="layui-btn layui-btn-normal hide${data.id}" onclick="agreeEnrollment1(${data.id})" href="javascript:;">报名通过</button><button class="layui-btn layui-btn-danger hide${data.id}" onclick="disagreeEnrollment1(${data.id})" href="javascript:;">报名拒绝</button>
+                    <button class="layui-btn layui-btn-warm show${data.id}" disabled>报名一审通过</button>
+                    <button class="layui-btn layui-btn-disabled reject${data.id}">报名审核拒绝</button>
+                    `
+                    return html
+                }
+                if (data.state == '报名二审中') {
+                    html = `<button class="layui-btn layui-btn-warm" disabled>报名一审通过</button>`
+                    return html
+                }
+                if (data.state == '报名审核通过') {
+                    html = `<button class="layui-btn layui-btn-warm" disabled>报名二审通过</button>`
+                    return html
+                }
+                if (data.state == '报名审核拒绝') {
+                    html = `<button class="layui-btn layui-btn-disabled">报名审核拒绝</button>`
+                    return html
+                }
+                if (data.state == '内容一审中') {
+                    html = `<button class="layui-btn layui-btn-normal" onclick="preview(${data.id})" href="javascript:;">内容预览</button>`
+                    return html
+                }
+                if (data.state == '内容二审中') {
+                    html = `<button class="layui-btn layui-btn-normal" onclick="preview(${data.id})" href="javascript:; ">内容预览</button>`
+                    return html
+                }
+                if (data.state == '内容审核通过') {
+                    html = `<button class="layui-btn layui-btn-normal" onclick="preview(${data.id})" href="javascript:;">内容预览</button>`
+                    return html
+                }
+                if (data.state == '内容审核驳回') {
+                    html = `<button class="layui-btn layui-btn-normal" onclick="preview(${data.id})" href="javascript:;">内容预览</button>`
+                    return html
+                }
+                if (data.state == '已完成') {
+                    html = `<button class="layui-btn layui-btn-normal" onclick="preview(${data.id})" href="javascript:;">内容预览</button>`
+                    return html
+                }
+                html = `<button class="layui-btn layui-btn-primary" disabled>未知状态</button>`
+                return html
+            };
+
+            var renderTable = function (data) {
+                var rows = [];
+                for (var i in data) {
+                    if (data[i].state == 0) {
+                        data[i].state = '报名一审中'
+                    } else if (data[i].state == 1) {
+                        data[i].state = "报名二审中"
+                    } else if (data[i].state == 2) {
+                        data[i].state = '报名审核通过'
+                    } else if (data[i].state == 3) {
+                        data[i].state = '报名审核拒绝'
+                    } else if (data[i].state == 4) {
+                        data[i].state = '内容一审中'
+                    } else if (data[i].state == 5) {
+                        data[i].state = '内容二审中'
+                    } else if (data[i].state == 6) {
+                        data[i].state = '内容审核通过'
+                    } else if (data[i].state == 7) {
+                        data[i].state = '内容审核驳回'
+                    } else if (data[i].state == 8) {
+                        data[i].state = '已完成'
+                    } else {
+                        data[i].state = '未知状态'
+                    }
+                    data[i].celebrity_id = "https://m.dianping.com/userprofile/" + data[i].celebrity_id
+                    rows.push(data[i])
+                };
+
+                exportData = rows;
+                var city = []
+                var states = []
+                var chargerName = []
+                //城市
+                if (rows.length == 0) {
+                    $('#newCity').append(new Option('请选择城市', "全部"));
+                    $("#newCity").children().attr("disabled",true).css("color","#ccc")
+                    $('#states').append(new Option('请选择合约状态', "全部"));
+                    $("#states").children().attr("disabled",true).css("color","#ccc")
+                    $('#agent').append(new Option('请选择经济人', "全部"));
+                    $("#agent").children().attr("disabled",true).css("color","#ccc")
+                    table.render({
+                            elem: '#dataTable'
+                            , totalRow: true
+                            , cols: [[
+                                { field: 'celebrity_name', title: '达人昵称', align: 'center', fixed: 'left', event: 'openUserProfile' }
+                                , { field: 'fans_count', title: '粉丝数', align: 'center', fixed: 'left', sort: true }
+                                , { field: 'charger_name', title: '经纪人', align: 'center', fixed: 'left' }
+                                , { field: 'mobile', title: '达人手机号', align: 'center', fixed: 'left', width: 110, sort: true }
+                                , { field: 'wx_name', title: '达人微信号', align: 'center', fixed: 'left', width: 120, sort: true }
+                                , { field: 'city', title: '履约城市', align: 'center', fixed: 'left', width: 80 }
+                                , { field: 'release_at', title: '探店时间', align: 'center', fixed: 'left', width: 140, sort: true }
+                                , { field: 'state', title: '合约状态', align: 'center', fixed: 'left', width: 120, }
+                                , { field: 'actions', title: '操作', align: 'center', templet: addButton, width: 240 }
+                            ]]
+                            , data: []
+                            , autoSort: true
+                            , limit: 1000
+                        });
+                }
+                else {
+
+                    rows.forEach(item => {
+                        city.push(item.city)
+                        states.push(item.state)
+                        chargerName.push(item.charger_name)
+                    })
+                    var city = [...new Set(city)]
+                    var states = [...new Set(states)]
+                    var chargerName = [...new Set(chargerName)]
+                    $('#newCity').append(new Option('全部履约城市', "全部"));
+                    city.forEach((item, index) => {
+                        $('#newCity').append(new Option(item, item));
+                    })
+                    $('#states').append(new Option('全部合约状态', "全部"));
+                    states.forEach((item, index) => {
+                        $('#states').append(new Option(item, item));
+                    })
+                    $("#agent").append(new Option('全部经济人', "全部"));
+                    chargerName.forEach((item, index) => {
+                        $('#agent').append(new Option(item, item));
+                    })
+                }
+
+                form.render('select');
+
+                //选择城市
+                form.on("submit(formDemo1)", function (newCityData) {
+                    if (newCityData.field.newCity != "" && newCityData.field.agent != "" && newCityData.field.states != "") {
+                        var newRow = []
+                        if (newCityData.field.newCity == "全部" && newCityData.field.agent == "全部" && newCityData.field.states == "全部") {
+                            newRow = rows
+                        }
+
+                        else if (newCityData.field.newCity == "全部" && newCityData.field.agent == "全部" && newCityData.field.states != "全部") {
+                            newRow = rows.filter(item => {
+                                return item.state == newCityData.field.states
+                            })
+                        }
+                        else if (newCityData.field.newCity == "全部" && newCityData.field.agent != "全部" && newCityData.field.states == "全部") {
+                            newRow = rows.filter(item => {
+                                return item.charger_name == newCityData.field.agent
+                            })
+                        }
+                        else if (newCityData.field.newCity != "全部" && newCityData.field.agent == "全部" && newCityData.field.states == "全部") {
+                            newRow = rows.filter(item => {
+                                return item.city == newCityData.field.newCity
+                            })
+                        }
+                        else if (newCityData.field.newCity == "全部" && newCityData.field.agent != "全部" && newCityData.field.states != "全部") {
+                            newRow = rows.filter(item => {
+                                return item.charger_name == newCityData.field.agent && item.state == newCityData.field.states
+                            })
+                        }
+                        else if (newCityData.field.newCity != "全部" && newCityData.field.agent == "全部" && newCityData.field.states != "全部") {
+                            newRow = rows.filter(item => {
+                                return item.city == newCityData.field.newCity && item.state == newCityData.field.states
+                            })
+                        }
+                        else if (newCityData.field.newCity != "全部" && newCityData.field.agent != "全部" && newCityData.field.states == "全部") {
+                            newRow = rows.filter(item => {
+                                return item.city == newCityData.field.newCity && item.charger_name == newCityData.field.agent
+                            })
+                        }
+                        else {
+                            newRow = rows.filter(item => {
+                                return item.city == newCityData.field.newCity && item.state == newCityData.field.states && item.charger_name == newCityData.field.agent
+                            })
+                        }
+
+                        table.render({
+                            elem: '#dataTable'
+                            , totalRow: true
+                            , cols: [[
+                                { field: 'celebrity_name', title: '达人昵称', align: 'center', fixed: 'left', event: 'openUserProfile' }
+                                , { field: 'fans_count', title: '粉丝数', align: 'center', fixed: 'left', sort: true }
+                                , { field: 'charger_name', title: '经纪人', align: 'center', fixed: 'left' }
+                                , { field: 'mobile', title: '达人手机号', align: 'center', fixed: 'left', width: 110, sort: true }
+                                , { field: 'wx_name', title: '达人微信号', align: 'center', fixed: 'left', width: 120, sort: true }
+                                , { field: 'city', title: '履约城市', align: 'center', fixed: 'left', width: 80 }
+                                , { field: 'release_at', title: '探店时间', align: 'center', fixed: 'left', width: 140, sort: true }
+                                , { field: 'state', title: '合约状态', align: 'center', fixed: 'left', width: 120, }
+                                , { field: 'actions', title: '操作', align: 'center', templet: addButton, width: 240 }
+                            ]]
+                            , data: newRow
+                            , autoSort: true
+                            , limit: 1000,
+                            done: function (res) {
+                                var contract_id = localStorage.getItem("contract_id")
+                                var that = this.elem.next();
+                                if (contract_id) {
+                                    let index = res.data.findIndex(item => item.id == contract_id)
+                                    console.log(index)
+                                    var tr = that.find(".layui-table-box tbody tr[data-index='" + index + "']");
+                                    tr.css("background-color", "rgb(255,184,0)").siblings().css("background-color", "#fff")
+                                }
+
+                            }
+                        });
+                    }
+                    else {
+                        layer.msg("请将内容选择完整")
+                    }
+
+                    return false;
+                })
+                table.render({
+                    elem: '#dataTable'
+                    , totalRow: true
+                    , cols: [[
+                        { field: 'celebrity_name', title: '达人昵称', align: 'center', fixed: 'left', event: 'openUserProfile' }
+                        , { field: 'fans_count', title: '粉丝数', align: 'center', fixed: 'left', sort: true }
+                        , { field: 'charger_name', title: '经纪人', align: 'center', fixed: 'left' }
+                        , { field: 'mobile', title: '达人手机号', align: 'center', fixed: 'left', width: 110, sort: true }
+                        , { field: 'wx_name', title: '达人微信号', align: 'center', fixed: 'left', width: 120, sort: true }
+                        , { field: 'city', title: '履约城市', align: 'center', fixed: 'left', width: 80 }
+                        , { field: 'release_at', title: '探店时间', align: 'center', fixed: 'left', width: 140, sort: true }
+                        , { field: 'state', title: '合约状态', align: 'center', fixed: 'left', width: 120 }
+                        , { field: 'actions', title: '操作', align: 'center', templet: addButton, width: 240 }
+                    ]]
+                    , data: rows
+                    , autoSort: true
+                    , limit: 1000,
+                    done: function (res) {
+                        var contract_id = localStorage.getItem("id")
+                        var that = this.elem.next();
+                        if (contract_id) {
+                            let index = res.data.findIndex(item => item.id == contract_id)
+                            console.log(index)
+                            var tr = that.find(".layui-table-box tbody tr[data-index='" + index + "']");
+                            tr.css("background-color", "rgb(255,184,0)").siblings().css("background-color", "#fff")
+                        }
+
+                    }
+                });
+
+                table.on('tool(dataTable)', function (obj) {
+                    if (obj.event === 'openUserProfile') {
+                        var celebrityId = obj.data.celebrity_id;
+                        window.open(celebrityId);
+                    }
+                });
+            };
+
+
+            var commId = window.location.href.split("=")[1];
+
+            var exportData = [];
+
+            $.ajax({
+                type: "GET",
+                url: "http://129.211.173.61:8080/api/v1.0/executor/participants/" + commId,
+                xhrFields: {
+                    withCredentials: true
+                },
+                headers: {
+                    "Access-Token": localStorage.getItem("accessToken")
+                },
+                success: function (data) {
+                    renderTable(data.result.contracts);
+                }
+            })
+
+            form.on("submit(export)", function (data) {
+                if (data.field.contractStatus == "") {
+                    layer.msg("请选择要导出的数据的合约状态", function () {
+                    });
+                    return false
+                };
+                var excelData = [];
+                excelData.push({
+                    celebrity_id: '达人链接',
+                    celebrity_name: '达人昵称',
+                    fans_count: '达人粉丝数',
+                    city: '履约城市',
+                    release_at: '预约探店时间'
+                });
+                if (data.field.contractStatus == "全部") {
+                    for (var i in exportData) {
+                        info = {
+                            celebrity_id: exportData[i].celebrity_id,
+                            celebrity_name: exportData[i].celebrity_name,
+                            fans_count: exportData[i].fans_count,
+                            city: exportData[i].city,
+                            release_at: exportData[i].release_at
+                        }
+                        excelData.push(info);
+                    }
+                } else {
+                    for (var i in exportData) {
+                        if (exportData[i].state == data.field.contractStatus) {
+                            info = {
+                                celebrity_id: exportData[i].celebrity_id,
+                                celebrity_name: exportData[i].celebrity_name,
+                                fans_count: exportData[i].fans_count,
+                                city: exportData[i].city,
+                                release_at: exportData[i].release_at
+                            }
+                            excelData.push(info);
+                        }
+                    }
+                }
+                var colConf = excel.makeColConfig({
+                    'A': 250,
+                    'B': 130,
+                    'C': 70,
+                    'D': 70,
+                    'E': 120
+                }, 100);
+                excel.exportExcel({
+                    sheet1: excelData
+                }, '报名信息.xlsx', 'xlsx', {
+                    extend: {
+                        '!cols': colConf
+                    }
+                });
+                return false
+            });
+        });
+</script>
+
+</html>

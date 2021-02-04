@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+    
+    <head>
+        <meta charset="UTF-8">
+        <title>力心传媒</title>
+        <meta name="renderer" content="webkit">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+        <link rel="stylesheet" href="./css/font.css">
+        <link rel="stylesheet" href="./css/xadmin.css">
+        <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+        <script src="./lib/layui/layui.js" charset="utf-8"></script>
+        <script type="text/javascript" src="./js/xadmin.js"></script>
+    </head>
+    
+    <body>
+        <!-- <div class="x-nav">
+            <h2>机构概览</h2>
+        </div> -->
+        <div class="layui-fluid">
+            <div class="layui-row">
+                <div class="layui-col-md12">
+                    <div class="layui-card">
+                        <div class="layui-card-body">
+                            <form class="layui-form">
+                                <div class="layui-row layui-col-space10">
+                                    <h3 class="layui-form-label layui-col-md3" style="width: auto">
+                                        下辖经纪人
+                                    </h3>
+                                    <div class="layui-col-md3">
+                                        <select name="charger" id="charger" lay-filter="charger" lay-submit="" lay-search>
+                                            <option value="">请选择经纪人（可模糊查询）</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;">
+                <legend>机构签约达人概览</legend>
+            </fieldset>
+            <div class="layui-row layui-col-space10" style="text-align:center;">
+                <div class="layui-col-md2">
+                    <div class="layui-card">
+                        <div class="layui-card-header">
+                            <h3>已签约达人数</h3>
+                        </div>
+                        <div class="layui-card-body" id="sign-celebrities-total-num">
+                            <i class="layui-icon layui-icon-loading layui-icon layui-anim layui-anim-rotate layui-anim-loop"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-md1">
+                </div>
+                <div class="layui-col-md2">
+                    <div class="layui-card">
+                      <div class="layui-card-header"><h3>达人总粉丝数</h3></div>
+                      <div class="layui-card-body" id="celebrity-fans-total-num">
+                        <i class="layui-icon layui-icon-loading layui-icon layui-anim layui-anim-rotate layui-anim-loop"></i>
+                      </div>
+                    </div>
+                </div>
+                <div class="layui-col-md1">
+                </div>
+                <div class="layui-col-md2">
+                    <div class="layui-card">
+                      <div class="layui-card-header"><h3>达人总内容数</h3></div>
+                      <div class="layui-card-body" id="celebrity-content-total-num">
+                        <i class="layui-icon layui-icon-loading layui-icon layui-anim layui-anim-rotate layui-anim-loop"></i>
+                      </div>
+                    </div>
+                </div>
+                <div class="layui-col-md2">
+                </div>
+            </div>
+            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;">
+                <legend>达人发文质量概览</legend>
+            </fieldset>
+            <div class="layui-row layui-col-space10" style="text-align:center;">
+                <div class="layui-col-md2">
+                    <div class="layui-card">
+                      <div class="layui-card-header"><h3>总曝光数</h3></div>
+                      <div class="layui-card-body" id="celebrity-exposure-total-num">
+                        <i class="layui-icon layui-icon-loading layui-icon layui-anim layui-anim-rotate layui-anim-loop"></i>
+                      </div>
+                    </div>
+                </div>
+                <div class="layui-col-md1">
+                </div>
+                <div class="layui-col-md2">
+                    <div class="layui-card">
+                      <div class="layui-card-header"><h3>总浏览数</h3></div>
+                      <div class="layui-card-body" id="total-views-count">
+                        <i class="layui-icon layui-icon-loading layui-icon layui-anim layui-anim-rotate layui-anim-loop"></i>
+                      </div>
+                    </div>
+                </div>
+                <div class="layui-col-md1">
+                </div>
+                <div class="layui-col-md2">
+                    <div class="layui-card">
+                      <div class="layui-card-header"><h3>总点赞数</h3></div>
+                      <div class="layui-card-body" id="total-fabulous-count">
+                        <i class="layui-icon layui-icon-loading layui-icon layui-anim layui-anim-rotate layui-anim-loop"></i>
+                      </div>
+                    </div>
+                </div>
+                <div class="layui-col-md1">
+                </div>
+                <div class="layui-col-md2">
+                    <div class="layui-card">
+                      <div class="layui-card-header"><h3>总POI点击数</h3></div>
+                      <div class="layui-card-body" id="total-poi-count">
+                        <i class="layui-icon layui-icon-loading layui-icon layui-anim layui-anim-rotate layui-anim-loop"></i>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;">
+                <legend>达人分级概览</legend>
+            </fieldset>
+            <div class="layui-row layui-col-space10" style="text-align:center;">
+                <div class="layui-col-md2">
+                    <div class="layui-card">
+                      <div class="layui-card-header"><h3>S级</h3></div>
+                      <div class="layui-card-body" id="level-S-num">
+                        <i class="layui-icon layui-icon-loading layui-icon layui-anim layui-anim-rotate layui-anim-loop"></i>
+                      </div>
+                    </div>
+                </div>
+                <div class="layui-col-md1">
+                </div>
+                <div class="layui-col-md2">
+                    <div class="layui-card">
+                      <div class="layui-card-header"><h3>A级</h3></div>
+                      <div class="layui-card-body" id="level-A-num">
+                        <i class="layui-icon layui-icon-loading layui-icon layui-anim layui-anim-rotate layui-anim-loop"></i>
+                      </div>
+                    </div>
+                </div>
+                <div class="layui-col-md1">
+                </div>
+                <div class="layui-col-md2">
+                    <div class="layui-card">
+                      <div class="layui-card-header"><h3>B级</h3></div>
+                      <div class="layui-card-body" id="level-B-num">
+                        <i class="layui-icon layui-icon-loading layui-icon layui-anim layui-anim-rotate layui-anim-loop"></i>
+                      </div>
+                    </div>
+                </div>
+                <div class="layui-col-md1">
+                </div>
+                <div class="layui-col-md2">
+                    <div class="layui-card">
+                      <div class="layui-card-header"><h3>C级</h3></div>
+                      <div class="layui-card-body" id="level-C-num">
+                        <i class="layui-icon layui-icon-loading layui-icon layui-anim layui-anim-rotate layui-anim-loop"></i>
+                      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script>
+        layui.use(['code', 'form'],
+            function() {
+                layui.code();
+
+                var form = layui.form;
+
+                function number_format(num) {
+                    return num && num.toString().replace(/(^|\s)\d+/g, (m) => m.replace(/(?=(?!\b)(\d{3})+$)/g, ','))
+                }
+
+                var renderMcnOverall = function(charger_id) {
+                    $.ajax({
+                        type: "GET",
+                        url: "http://129.211.173.61:8080/api/v1.0/organizations_overview/infos?charger_id=" + charger_id,
+                        xhrFields: { 
+                            withCredentials: true 
+                        },
+                        headers: {
+                            "Access-Token": localStorage.getItem("accessToken"),
+                            "Content-Type":"application/json;charset=utf8"
+                        },
+                        success: function(data){
+                            if (data.code == 200) {
+                                $('#celebrity-content-total-num').html('<h2>' + number_format(data.result.celebrity_content_total_num) + '</h2>');
+                                $('#celebrity-exposure-total-num').html('<h2>' +number_format(data.result.celebrity_exposure_total_num) + '</h2>');
+                                $('#celebrity-fans-total-num').html('<h2>' + number_format(data.result.celebrity_fans_total_num) + '</h2>');
+                                $('#level-A-num').html('<h2>' + number_format(data.result.level_A_num) + '</h2>');
+                                $('#level-B-num').html('<h2>' + number_format(data.result.level_B_num) + '</h2>');
+                                $('#level-C-num').html('<h2>' + number_format(data.result.level_C_num) + '</h2>');
+                                $('#level-S-num').html('<h2>' + number_format(data.result.level_S_num) + '</h2>');
+                                $('#sign-celebrities-total-num').html('<h2>' + number_format(data.result.sign_celebrities_total_num) + '</h2>');
+                                $('#total-fabulous-count').html('<h2>' + number_format(data.result.total_fabulous_count) + '</h2>');
+                                $('#total-poi-count').html('<h2>' + number_format(data.result.total_poi_count) + '</h2>');
+                                $('#total-views-count').html('<h2>' + number_format(data.result.total_views_count) + '</h2>');
+                            } else {
+                                layer.msg("没有权限",function(){
+                                    window.parent.location.href = 'login.html';
+                                })
+                            };
+                        }
+                    });
+                }
+
+
+                form.on('select(charger)', function(data){
+                    var charger_id = data.value;
+                    console.log(charger_id)
+                    renderMcnOverall(charger_id);
+                    return false
+                });
+
+
+                $.ajax({
+                    type: "GET",
+                    url: "http://129.211.173.61:8080/api/v1.0/display_charger/list",
+                    xhrFields: { 
+                        withCredentials: true 
+                    },
+                    headers: {
+                        "Access-Token": localStorage.getItem("accessToken"),
+                        "Content-Type":"application/json;charset=utf8"
+                    },
+                    success: function(data){
+                        if (data.code == 200) {
+                            var chargerList = data.result;
+                            $('#charger').children().remove();
+                            $('#charger').append(new Option('所有经纪人', -1));
+                            for (var i in chargerList) {
+                                $('#charger').append(new Option(chargerList[i].name, chargerList[i].id));
+                            };
+                            form.render('select');
+                            renderMcnOverall(-1);
+                        } else {
+                            layer.msg("没有权限",function(){
+                                window.parent.location.href = 'login.html';
+                            })
+                        }
+                    }
+                });
+        });
+    </script>
+
+</html>

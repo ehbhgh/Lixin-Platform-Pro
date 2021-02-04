@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+    
+    <head>
+        <meta charset="UTF-8">
+        <title>力心传媒</title>
+        <meta name="renderer" content="webkit">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+        <link rel="stylesheet" href="./css/font.css">
+        <link rel="stylesheet" href="./css/xadmin.css">
+        <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+        <script src="./lib/layui/layui.js" charset="utf-8"></script>
+        <script type="text/javascript" src="./js/xadmin.js"></script>
+    </head>
+    <body>
+        <div class="layui-fluid">
+            <div class="layui-row">
+                <form class="layui-form">
+                    <div class="layui-form-item">
+                        <label for="charger" class="layui-form-label">
+                            <span class="x-red">*</span>经纪人</label>
+                        <div class="layui-input-inline">
+                            <select id="charger" name="charger">
+                                <option value="">请选择经纪人</option>
+                            </select>
+                    </div>
+                    <div class="layui-form-item">
+                        <label for="celebrity" class="layui-form-label">
+                            <span class="x-red">*</span>达人ID</label>
+                        <div class="layui-input-inline">
+                            <input type="text" id="celebrity" name="celebrity" required="" lay-verify="required" autocomplete="off" class="layui-input"></div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label for="L_repass" class="layui-form-label"></label>
+                        <button class="layui-btn" lay-filter="add" lay-submit="">新增</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script>layui.use(['form', 'layer', 'code'],
+            function() {
+                
+                form = layui.form,
+                layer = layui.layer;
+
+                layui.code();
+
+                $.ajax({
+                    type: "GET",
+                    url: "http://129.211.173.61:8080/api/v1.0/display_charger/list",
+                    xhrFields: { 
+                        withCredentials: true 
+                    },
+                    headers: {
+                        "Access-Token": localStorage.getItem("accessToken"),
+                        "Content-Type":"application/json;charset=utf8"
+                    },
+                    success: function(data){
+                        if (data.code == 200) {
+                            var chargerList = data.result;
+                            $('#charger').children().remove();
+                            for (var i in chargerList) {
+                                $('#charger').append(new Option(chargerList[i].name, chargerList[i].id));
+                            };
+                            form.render('select');
+                        } else {
+                            layer.msg("没有权限",function(){
+                                window.parent.location.href = 'login.html';
+                            })
+                        }
+                    }
+                });
+
+                //监听提交
+                form.on('submit(add)', function(data) {
+                    $.ajax({
+                        type: "POST",
+                        url: "http://129.211.173.61:8080/api/v1.0/establish/charger_with_celebrity",
+                        xhrFields: { 
+                            withCredentials: true 
+                        },
+                        headers: {
+                            "Access-Token": localStorage.getItem("accessToken"),
+                            "Content-Type":"application/json;charset=utf8"
+                        },
+                        data: JSON.stringify({
+                            charger_id: parseInt(data.field.charger),
+                            celebrity_id: data.field.celebrity
+                        }),
+                        success: function(data) {
+                            if (data.code == 200){
+                                layer.alert(data.msg, {
+                                    icon: 6
+                                },
+                                function() {
+                                    var index = parent.layer.getFrameIndex(window.name);
+                                    parent.layer.close(index);
+                                });
+                            } else {
+                                layer.alert(data.msg, {
+                                    icon: 5
+                                },
+                                function() {
+                                    var index = parent.layer.getFrameIndex(window.name);
+                                    parent.layer.close(index);
+                                });
+                            }
+                        }
+                    });
+                    return false;
+                });
+
+            });
+        </script>
+    </body>
+
+</html>

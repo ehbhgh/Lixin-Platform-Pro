@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+    
+    <head>
+        <meta charset="UTF-8">
+        <title>力心传媒</title>
+        <meta name="renderer" content="webkit">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+        <link rel="stylesheet" href="./css/font.css">
+        <link rel="stylesheet" href="./css/xadmin.css">
+        <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+        <script src="./lib/layui/layui.js" charset="utf-8"></script>
+        <script type="text/javascript" src="./js/xadmin.js"></script>
+        <script type="text/javascript" src="./lib/echarts.js"></script>
+    </head>
+    
+    <body>
+<!--         <div class="x-nav">
+            <h2>达人数据概览</h2>
+        </div> -->
+        <div class="layui-fluid">
+            <div class="layui-row">
+                <div class="layui-col-md12">
+                    <div class="layui-card">
+                        <div class="layui-card-body">
+                            <form class="layui-form">
+                                <div class="layui-row layui-col-space10">
+                                    <h3 class="layui-form-label layui-col-md3" style="width: auto">
+                                        城市
+                                    </h3>
+                                    <div class="layui-col-md3">
+                                        <select name="user_city" id="user_city" lay-filter="user_city" lay-submit="" lay-search>
+                                            <option value="">请选择城市（可模糊输入搜索）</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="layui-row layui-col-space10">
+                                    <h3 class="layui-form-label layui-col-md3" style="width: auto">
+                                        维度
+                                    </h3>
+                                    <div class="layui-col-md1">
+                                        <button class="layui-btn layui-btn-primary" id="overallData" lay-submit="" lay-filter="overallData">
+                                            总体数据
+                                        </button>
+                                    </div>
+                                    <div class="layui-col-md1">
+                                        <button class="layui-btn" id="monthlyData" lay-submit="" lay-filter="monthlyData">
+                                            当月增量
+                                        </button>
+                                    </div>
+                                    <div class="layui-col-md1">
+                                        <input id="timeSpan" name="timeSpan" value="month" type="hidden">
+                                    </div>
+                                </div>
+                                <div class="layui-row layui-col-space10">
+                                    <h3 class="layui-form-label layui-col-md3" style="width: auto">
+                                        榜单
+                                    </h3>
+                                    <div class="layui-col-md1">
+                                        <button class="layui-btn" id="fans" lay-submit="" lay-filter="fans">
+                                            粉丝数量
+                                        </button>
+                                    </div>
+                                    <div class="layui-col-md1">
+                                        <button class="layui-btn layui-btn-primary" id="contents" lay-submit="" lay-filter="contents">
+                                            笔记数量
+                                        </button>
+                                    </div>
+                                    <div class="layui-col-md1">
+                                        <button class="layui-btn layui-btn-primary" id="videoContents" lay-submit="" lay-filter="videoContents">
+                                            视频笔记
+                                        </button>
+                                    </div>
+                                    <div class="layui-col-md1">
+                                        <button class="layui-btn layui-btn-primary" id="browsingTime" lay-submit="" lay-filter="browsingTime">
+                                            浏览数量
+                                        </button>
+                                    </div>
+                                    <div class="layui-col-md1">
+                                        <button class="layui-btn layui-btn-primary" id="likes" lay-submit="" lay-filter="likes">
+                                            点赞数量
+                                        </button>
+                                    </div>
+                                    <div class="layui-col-md1">
+                                        <button class="layui-btn layui-btn-primary" id="poi" lay-submit="" lay-filter="poi">
+                                            poi数量
+                                        </button>
+                                    </div>
+                                    <div class="layui-col-md1">
+                                        <button class="layui-btn layui-btn-primary" id="exposure" lay-submit="" lay-filter="exposure">
+                                            曝光数量
+                                        </button>
+                                    </div>
+                                    <div class="layui-col-md1">
+                                        <input id="sortKey" name="sortKey" value="fans" type="hidden">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <hr>
+                        <div class="layui-card-body" id="sign-celebrities-total-num">
+                            <div class="layui-row">
+                                <blockquote class="layui-elem-quote">
+                                    <span class="layui-badge-dot"></span>
+                                    单击达人昵称，可在新窗口打开该达人的个人主页
+                                </blockquote>
+                            </div>
+                            <div class="layui-row">
+                                <table id="dataTable" lay-filter="dataTable"></table>
+                                <div id="pagination"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script>
+        layui.use(['code', 'table', 'form', 'laypage'],
+            function() {
+                layui.code();
+
+                var form = layui.form;
+
+                var table = layui.table;
+
+                var laypage = layui.laypage;
+
+                function number_format(num) {
+                    return num && num.toString().replace(/(^|\s)\d+/g, (m) => m.replace(/(?=(?!\b)(\d{3})+$)/g, ','))
+                };
+
+                var addButton = function(data) {
+                    var detailUrl = 'author-detail.html?user_id=' + data.celebrity_id;
+                    html = `<button class="layui-btn" onclick="xadmin.open('查看作品','${detailUrl}')" href="javascript:;">查看作品</button>`
+                    return html
+                };
+
+                var createMonthlyTable = function(user_city, sortKey) {
+                    $.ajax({
+                        type: "POST",
+                        url: "http://129.211.173.61:8080/api/v1.0/celebrity_data_overview/infos",
+                        xhrFields: { 
+                            withCredentials: true 
+                        },
+                        headers: {
+                            "Access-Token": localStorage.getItem("accessToken"),
+                            "Content-Type":"application/json;charset=utf8"
+                        },
+                        data: JSON.stringify({
+                            user_city: user_city,
+                            page: 1,
+                            per_page: 10,
+                            sort:{
+                                key: sortKey,
+                                order: 'desc'
+                            }
+                        }),
+                        success: function(data){
+                            if (data.code != 200) {
+                                layer.msg(data.msg,function(){
+                                })
+                            } else {
+                                var user_infos = data.user_infos;
+                                table.render({
+                                    elem: '#dataTable'
+                                    ,totalRow: true
+                                    ,cols: [[
+                                        {field: 'celebrity_nickname', title: '达人昵称', align: 'center', event: 'openUserProfile'}
+                                      ,{field: 'celebrities_note_video_num', title: '月视频笔记数', align: 'center'}
+                                      ,{field: 'celebrities_increment_fans_num', title: '月粉丝增量', align: 'center'}
+                                      ,{field: 'browsing_time', title: '月浏览增量', align: 'center'} 
+                                      ,{field: 'note_num', title: '月笔记数增量', align: 'center'}
+                                      ,{field: 'celebrities_praise_add_num', title: '月点赞增量', align: 'center'}
+                                      ,{field: 'celebrities_poi_add_num', title: '月POI点击增量', align: 'center'}
+                                      ,{field: 'celebrities_exposure_add_num', title: '月曝光增量', align: 'center'}
+                                      ,{field: 'actions', title: '操作', align: 'center', templet: addButton}
+                                    ]]
+                                    ,data: user_infos
+                                    ,autoSort: false
+                                    ,limit: 10
+                                });
+                                
+                                table.on('tool(dataTable)', function(obj){
+                                    if (obj.event === 'openUserProfile'){
+                                        var celebrityId = obj.data.celebrity_id;
+                                        var url = "https://m.dianping.com/userprofile/" + celebrityId
+                                        window.open(url);
+                                    }
+                                });
+
+                                laypage.render({
+                                    elem: 'pagination',
+                                    count: data.total,
+                                    limit: 10,
+                                    curr: 1,
+                                    groups: 3,
+                                    layout: ['count', 'prev', 'next', 'page', 'skip'],
+                                    jump: function(obj, first){
+                                        if (!first) {
+                                            $.ajax({
+                                                type: "POST",
+                                                url: "http://129.211.173.61:8080/api/v1.0/celebrity_data_overview/infos",
+                                                xhrFields: { 
+                                                    withCredentials: true 
+                                                },
+                                                headers: {
+                                                    "Access-Token": localStorage.getItem("accessToken"),
+                                                    "Content-Type":"application/json;charset=utf8"
+                                                },
+                                                data: JSON.stringify({
+                                                    user_city: user_city,
+                                                    page: obj.curr,
+                                                    per_page: obj.limit,
+                                                    sort:{
+                                                        key: sortKey,
+                                                        order: 'desc'
+                                                    }
+                                                }),
+                                                success: function(data){
+                                                    if (data.code == 200) {
+                                                        var user_infos = data.user_infos;
+                                                        table.reload('dataTable', {
+                                                            data: user_infos
+                                                        })
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    }
+                                })
+                            };
+                        }
+                    });
+                };
+
+                var createOverallTable = function(user_city, sortKey) {
+                    $.ajax({
+                        type: "POST",
+                        url: "http://129.211.173.61:8080/api/v1.0/celebrities_master/infos",
+                        xhrFields: { 
+                            withCredentials: true 
+                        },
+                        headers: {
+                            "Access-Token": localStorage.getItem("accessToken"),
+                            "Content-Type":"application/json;charset=utf8"
+                        },
+                        data: JSON.stringify({
+                            user_city: user_city,
+                            page: 1,
+                            per_page: 10,
+                            sort:{
+                                key: sortKey,
+                                order: 'desc'
+                            }
+                        }),
+                        success: function(data){
+                            if (data.code != 200) {
+                                layer.msg(data.msg,function(){
+                                })
+                            } else {
+                                var user_infos = data.user_infos;
+                                table.render({
+                                    elem: '#dataTable'
+                                    ,totalRow: true
+                                    ,cols: [[
+                                        {field: 'celebrity_nickname', title: '达人昵称', align: 'center', event: 'openUserProfile'}
+                                      ,{field: 'celebrities_note_video_num', title: '半年视频笔记数', align: 'center'}
+                                      ,{field: 'celebrities_increment_fans_num', title: '总粉丝数', align: 'center'}
+                                      ,{field: 'browsing_time', title: '半年浏览量', align: 'center'} 
+                                      ,{field: 'note_num', title: '半年笔记数', align: 'center'}
+                                      ,{field: 'celebrities_praise_add_num', title: '半年点赞数', align: 'center'}
+                                      ,{field: 'celebrities_poi_add_num', title: '半年POI点击数', align: 'center'}
+                                      ,{field: 'celebrities_exposure_add_num', title: '半年曝光量', align: 'center'}
+                                      ,{field: 'actions', title: '操作', align: 'center', templet: addButton}
+                                    ]]
+                                    ,data: user_infos
+                                    ,autoSort: false
+                                    ,limit: 10
+                                });
+
+                                table.on('tool(dataTable)', function(obj){
+                                    if (obj.event === 'openUserProfile'){
+                                        var celebrityId = obj.data.celebrity_id;
+                                        var url = "https://m.dianping.com/userprofile/" + celebrityId
+                                        window.open(url);
+                                    }
+                                });
+                                
+                                laypage.render({
+                                    elem: 'pagination',
+                                    count: data.total,
+                                    limit: 10,
+                                    curr: 1,
+                                    groups: 3,
+                                    layout: ['count', 'prev', 'next', 'page', 'skip'],
+                                    jump: function(obj, first){
+                                        if (!first) {
+                                            $.ajax({
+                                                type: "POST",
+                                                url: "http://129.211.173.61:8080/api/v1.0/celebrities_master/infos",
+                                                xhrFields: { 
+                                                    withCredentials: true 
+                                                },
+                                                headers: {
+                                                    "Access-Token": localStorage.getItem("accessToken"),
+                                                    "Content-Type":"application/json;charset=utf8"
+                                                },
+                                                data: JSON.stringify({
+                                                    user_city: user_city,
+                                                    page: obj.curr,
+                                                    per_page: obj.limit,
+                                                    sort:{
+                                                        key: sortKey,
+                                                        order: 'desc'
+                                                    }
+                                                }),
+                                                success: function(data){
+                                                    if (data.code == 200) {
+                                                        var user_infos = data.user_infos;
+                                                        table.reload('dataTable', {
+                                                            data: user_infos
+                                                        })
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    }
+                                })
+                            };
+
+                        }
+                    });
+                };
+
+                var getSortKey = function(sortKeyString){
+                    if (sortKeyString == 'fans') {
+                        return 'increment_fans_num'
+                    }
+                    if (sortKeyString == 'contents') {
+                        return 'note_num'
+                    }
+                    if (sortKeyString == 'videoContents') {
+                        return 'note_video_num'
+                    }
+                    if (sortKeyString == 'browsingTime') {
+                        return 'browsing_time'
+                    }
+                    if (sortKeyString == 'likes') {
+                        return 'praise_add_num'
+                    }
+                    if (sortKeyString == 'poi') {
+                        return 'poi_add_num'
+                    }
+                    if (sortKeyString == 'exposure') {
+                        return 'exposure_add_num'
+                    }
+                    return ''
+                };
+
+                var setSortButtonUnselected = function(values, selected){
+                    for (var i in values){
+                        e = '#' + values[i]
+                        if (values[i] == selected) {
+                            $(e).attr('class', 'layui-btn');
+                        } else {
+                            $(e).attr('class', 'layui-btn layui-btn-primary');
+                        }
+                    }
+                };
+
+                var buttonFilterNames = [
+                    'fans',
+                    'contents',
+                    'videoContents',
+                    'browsingTime',
+                    'likes',
+                    'poi',
+                    'exposure'
+                ]
+
+                $.ajax({
+                    type: "GET",
+                    url: "http://129.211.173.61:8080/api/v1.0/celebrity_cities/infos",
+                    xhrFields: { 
+                        withCredentials: true 
+                    },
+                    headers: {
+                        "Access-Token": localStorage.getItem("accessToken"),
+                        "Content-Type":"application/json;charset=utf8"
+                    },
+                    success: function(data){
+                        if (data.code == 200) {
+                            var cityList = data.result;
+                            $('#user_city').children().remove();
+                            $('#user_city').append(new Option('全国', '全国'));
+                            for (var i in cityList) {
+                                $('#user_city').append(new Option(cityList[i], cityList[i]));
+                            };
+                            form.render('select');
+                            var user_city = $('#user_city')[0].options[0].value;
+                            createMonthlyTable(user_city, 'increment_fans_num');
+                        } else {
+                            layer.msg("没有权限",function(){
+                                window.parent.location.href = 'login.html';
+                            })
+                        }
+                    }
+                });
+                
+                form.on('select(user_city)', function(data){
+                    var user_city = data.value;
+                    var timeSpan = $('#timeSpan').val();
+                    var sortKeyString = $('#sortKey').val();
+                    var sortKey = getSortKey(sortKeyString);
+                    if (sortKey == '') {
+                        return false
+                    }
+                    if (timeSpan == 'month') {
+                        createMonthlyTable(user_city, sortKey);
+                        return false
+                    } 
+                    if (timeSpan == 'overall') {
+                        createOverallTable(user_city, sortKey);
+                        return false
+                    }
+                    return false
+                });
+
+
+                form.on('submit(monthlyData)', function(data){
+                    $('#timeSpan').attr('value', 'month');
+                    $('#monthlyData').attr('class', 'layui-btn');
+                    $('#overallData').attr('class', 'layui-btn layui-btn-primary');
+                    var user_city = data.field.user_city;
+                    var sortKeyString = $('#sortKey').val();
+                    var sortKey = getSortKey(sortKeyString);
+                    if (sortKey == '') {
+                        return false
+                    }
+                    createMonthlyTable(user_city, sortKey);
+                    return false;
+                });
+
+                form.on('submit(overallData)', function(data){
+                    $('#timeSpan').attr('value', 'overall');
+                    $('#monthlyData').attr('class', 'layui-btn layui-btn-primary');
+                    $('#overallData').attr('class', 'layui-btn');
+                    var user_city = data.field.user_city;
+                    var sortKeyString = $('#sortKey').val();
+                    var sortKey = getSortKey(sortKeyString);
+                    if (sortKey == '') {
+                        return false
+                    }
+                    createOverallTable(user_city, sortKey);
+                    return false
+                });
+
+                form.on('submit(fans)', function(data){
+                    $('#sortKey').attr('value', 'fans');
+                    setSortButtonUnselected(buttonFilterNames, 'fans');
+                    var timeSpan = $('#timeSpan').val();
+                    var user_city = data.field.user_city;
+                    var sortKey = getSortKey('fans');
+                    if (timeSpan == 'month') {
+                        createMonthlyTable(user_city, sortKey);
+                        return false
+                    } 
+                    if (timeSpan == 'overall') {
+                        createOverallTable(user_city, sortKey);
+                        return false
+                    }
+                    return false
+                });
+
+                form.on('submit(contents)', function(data){
+                    $('#sortKey').attr('value', 'contents');
+                    setSortButtonUnselected(buttonFilterNames, 'contents');
+                    var timeSpan = $('#timeSpan').val();
+                    var user_city = data.field.user_city;
+                    var sortKey = getSortKey('contents');
+                    if (timeSpan == 'month') {
+                        createMonthlyTable(user_city, sortKey);
+                        return false
+                    } 
+                    if (timeSpan == 'overall') {
+                        createOverallTable(user_city, sortKey);
+                        return false
+                    }
+                    return false
+                });
+
+                form.on('submit(videoContents)', function(data){
+                    $('#sortKey').attr('value', 'videoContents');
+                    setSortButtonUnselected(buttonFilterNames, 'videoContents');
+                    var timeSpan = $('#timeSpan').val();
+                    var user_city = data.field.user_city;
+                    var sortKey = getSortKey('videoContents');
+                    if (timeSpan == 'month') {
+                        createMonthlyTable(user_city, sortKey);
+                        return false
+                    } 
+                    if (timeSpan == 'overall') {
+                        createOverallTable(user_city, sortKey);
+                        return false
+                    }
+                    return false
+                });
+
+                form.on('submit(browsingTime)', function(data){
+                    $('#sortKey').attr('value', 'browsingTime');
+                    setSortButtonUnselected(buttonFilterNames, 'browsingTime');
+                    var timeSpan = $('#timeSpan').val();
+                    var user_city = data.field.user_city;
+                    var sortKey = getSortKey('browsingTime');
+                    if (timeSpan == 'month') {
+                        createMonthlyTable(user_city, sortKey);
+                        return false
+                    } 
+                    if (timeSpan == 'overall') {
+                        createOverallTable(user_city, sortKey);
+                        return false
+                    }
+                    return false
+                });
+
+                form.on('submit(likes)', function(data){
+                    $('#sortKey').attr('value', 'likes');
+                    setSortButtonUnselected(buttonFilterNames, 'likes');
+                    var timeSpan = $('#timeSpan').val();
+                    var user_city = data.field.user_city;
+                    var sortKey = getSortKey('likes');
+                    if (timeSpan == 'month') {
+                        createMonthlyTable(user_city, sortKey);
+                        return false
+                    } 
+                    if (timeSpan == 'overall') {
+                        createOverallTable(user_city, sortKey);
+                        return false
+                    }
+                    return false
+                });
+
+                form.on('submit(poi)', function(data){
+                    $('#sortKey').attr('value', 'poi');
+                    setSortButtonUnselected(buttonFilterNames, 'poi');
+                    var timeSpan = $('#timeSpan').val();
+                    var user_city = data.field.user_city;
+                    var sortKey = getSortKey('poi');
+                    if (timeSpan == 'month') {
+                        createMonthlyTable(user_city, sortKey);
+                        return false
+                    } 
+                    if (timeSpan == 'overall') {
+                        createOverallTable(user_city, sortKey);
+                        return false
+                    }
+                    return false
+                });
+
+                form.on('submit(exposure)', function(data){
+                    $('#sortKey').attr('value', 'exposure');
+                    setSortButtonUnselected(buttonFilterNames, 'exposure');
+                    var timeSpan = $('#timeSpan').val();
+                    var user_city = data.field.user_city;
+                    var sortKey = getSortKey('exposure');
+                    if (timeSpan == 'month') {
+                        createMonthlyTable(user_city, sortKey);
+                        return false
+                    } 
+                    if (timeSpan == 'overall') {
+                        createOverallTable(user_city, sortKey);
+                        return false
+                    }
+                    return false
+                });
+    
+        });
+    </script>
+
+</html>

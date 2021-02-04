@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+    
+    <head>
+        <meta charset="UTF-8">
+        <title>力心传媒</title>
+        <meta name="renderer" content="webkit">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+        <link rel="stylesheet" href="./css/font.css">
+        <link rel="stylesheet" href="./css/xadmin.css">
+        <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+        <script src="./lib/layui/layui.js" charset="utf-8"></script>
+        <script type="text/javascript" src="./js/xadmin.js"></script>
+        <script type="text/javascript" src="./lib/echarts.js"></script>
+    </head>
+    
+    <body>
+        <!-- <div class="x-nav">
+            <h2>机构概览</h2>
+        </div> -->
+        <div class="layui-fluid">
+            <div class="x-nav">
+                <h2>
+                    机构评级考核指标
+                </h2>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-md12">
+                    <div class="layui-card">
+                        <div class="layui-card-body">
+                            <form class="layui-form">
+                                <div class="layui-row layui-col-space10">
+                                    <h3 class="layui-form-label layui-col-md3" style="width: auto">
+                                        下辖经纪人
+                                    </h3>
+                                    <div class="layui-col-md3">
+                                        <select name="charger" id="charger" lay-filter="charger" lay-submit="" lay-search>
+                                            <option value="">请选择经纪人（可模糊查询）</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row layui-col-space10" style="text-align:center;">
+                <div class="layui-col-md6">
+                    <div class="layui-card">
+                        <div class="layui-card-header" id="active-author-num">
+                            活跃作者数：
+                            <i class="layui-icon layui-icon-loading layui-icon layui-anim layui-anim-rotate layui-anim-loop"></i> 
+                        </div>
+                        <div class="layui-card-body">
+                            <div id="activeAuthorGauge" style="width: 100%;height:210px;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-md6">
+                    <div class="layui-card">
+                        <div class="layui-card-header" id="author-release-video-num">
+                            月人均发布视频笔记数：
+                            <i class="layui-icon layui-icon-loading layui-icon layui-anim layui-anim-rotate layui-anim-loop"></i> 
+                        </div>
+                        <div class="layui-card-body">
+                            <div id="videoGauge" style="width: 100%;height:210px;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row layui-col-space10" style="text-align:center;">
+                <div class="layui-col-md6">
+                    <div class="layui-card">
+                        <div class="layui-card-header" id="author-browsing-time">
+                            月用户浏览总时长：
+                            <i class="layui-icon layui-icon-loading layui-icon layui-anim layui-anim-rotate layui-anim-loop"></i>
+                        </div>
+                        <div class="layui-card-body">
+                            <div id="timeGauge" style="width: 100%;height:210px;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-md6">
+                    <div class="layui-card">
+                        <div class="layui-card-header" id="total-fanstotal-poi-count">
+                            站内粉丝总量：
+                            <i class="layui-icon layui-icon-loading layui-icon layui-anim layui-anim-rotate layui-anim-loop"></i>
+                        </div>
+                        <div class="layui-card-body">
+                            <div id="fansGauge" style="width: 100%;height:210px;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script>
+        layui.use(['code', 'form'],
+            function() {
+                layui.code();
+
+                var form = layui.form;
+
+                function number_format(num) {
+                    return num && num.toString().replace(/(^|\s)\d+/g, (m) => m.replace(/(?=(?!\b)(\d{3})+$)/g, ','))
+                };
+
+                var createPic = function(chart, value) {
+                    option = {
+                        series: [
+                            {
+                                name: '完成率',
+                                type: 'gauge',
+                                z: 3,
+                                min: 0,
+                                max: 100,
+                                splitNumber: 5,
+                                radius: '100%',
+                                axisLine: {            
+                                    lineStyle: {       
+                                        width: 10
+                                    }
+                                },
+                                axisTick: {            
+                                    length: 15,       
+                                    lineStyle: {       
+                                        color: 'auto'
+                                    }
+                                },
+                                splitLine: {           
+                                    length: 20,        
+                                    lineStyle: {       
+                                        color: 'auto'
+                                    }
+                                },
+                                title: {
+                                    fontWeight: 'bolder',
+                                    fontSize: 20
+                                },
+                                detail: {
+                                    formatter: "{value}%",
+                                    fontSize: 20
+                                },
+                                // startAngle: 180,
+                                // endAngle: 0,
+                                data: [{name: "完成率", value: value}]
+                            }
+                        ]
+                    };
+                    chart.setOption(option, true);
+                };
+
+                var renderKpiData = function(charger_id) {
+                    $.ajax({
+                        type: "GET",
+                        url: "http://129.211.173.61:8080/api/v1.0/organizations_level/infos?charger_id=" + charger_id,
+                        xhrFields: { 
+                            withCredentials: true 
+                        },
+                        headers: {
+                            "Access-Token": localStorage.getItem("accessToken"),
+                            "Content-Type":"application/json;charset=utf8"
+                        },
+                        success: function(data){
+                            if (data.code == 200) {
+                                console.log(data);
+                                $('#active-author-num').html("<h3>活跃作者数：<span style=\"color:red\">" + number_format(data.result.active_author_num) + "</span> | " + number_format(data.result.active_index_num) + "</h3>");
+                                $('#author-release-video-num').html("<h3>月人均发布视频笔记数：<span style=\"color:red\">" + number_format(data.result.author_release_video_num) + "</span> | 8.0</h3>");
+                                $('#author-browsing-time').html("<h3>月用户浏览总时长：<span style=\"color:red\">" + number_format(data.result.author_browsing_time) + "</span> | " + number_format(data.result.browsing_time_index_num) + "</h3>");
+                                $('#total-fanstotal-poi-count').html("<h3>站内粉丝总量：<span style=\"color:red\">" + number_format(data.result.total_fanstotal_poi_count) + "</span> | " + number_format(data.result.fanstotal_poi_count_index_num) + "</h3>");
+
+                                var chart = echarts.init(document.getElementById('activeAuthorGauge'));
+                                createPic(chart, parseInt(data.result.percent_active_author.split(".")[0]));
+
+                                var chart = echarts.init(document.getElementById('videoGauge'));
+                                createPic(chart, parseInt(data.result.percent_release_video.split(".")[0]));
+
+                                var chart = echarts.init(document.getElementById('timeGauge'));
+                                createPic(chart, parseInt(data.result.percent_browsing_time.split(".")[0]));
+
+                                var chart = echarts.init(document.getElementById('fansGauge'));
+                                createPic(chart, parseInt(data.result.percent_fanstotal_poi.split(".")[0]));
+                            } else {
+                                layer.msg("没有权限",function(){
+                                    window.parent.location.href = 'login.html';
+                                })
+                            };
+                        }
+                    });
+                }
+
+
+                form.on('select(charger)', function(data){
+                    var charger_id = data.value;
+                    console.log(charger_id)
+                    renderKpiData(charger_id);
+                    return false
+                });
+
+
+                $.ajax({
+                    type: "GET",
+                    url: "http://129.211.173.61:8080/api/v1.0/display_charger/list",
+                    xhrFields: { 
+                        withCredentials: true 
+                    },
+                    headers: {
+                        "Access-Token": localStorage.getItem("accessToken"),
+                        "Content-Type":"application/json;charset=utf8"
+                    },
+                    success: function(data){
+                        if (data.code == 200) {
+                            var chargerList = data.result;
+                            $('#charger').children().remove();
+                            $('#charger').append(new Option('所有经纪人', -1));
+                            for (var i in chargerList) {
+                                $('#charger').append(new Option(chargerList[i].name, chargerList[i].id));
+                            };
+                            form.render('select');
+                            renderKpiData(-1);
+                        } else {
+                            layer.msg("没有权限",function(){
+                                window.parent.location.href = 'login.html';
+                            })
+                        }
+                    }
+                });
+        });
+    </script>
+
+</html>
